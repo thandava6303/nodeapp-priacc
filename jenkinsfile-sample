@@ -10,9 +10,12 @@ properties([pipelineTriggers([pollSCM('* * * * *')])])
         }
 
         stage('Check Required Tools') {
-            steps {
-                // check docker version
-                // check unzip version
+           steps {
+                echo 'Checking Docker version...'
+                sh 'docker --version'
+                
+                echo 'Checking unzip version...'
+                sh 'unzip -v'
             }
         }
 
