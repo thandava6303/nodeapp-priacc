@@ -33,17 +33,20 @@ properties([pipelineTriggers([pollSCM('* * * * *')])])
         }
 
         stage('Docker Build Image') {
-            steps {
-                // docker build code here
+             steps {
+                script {
+                    // Build a Docker image from a Dockerfile
+                    docker.build('my-app-image:latest')
+                }
             }
-        }
 
         stage('Docker Run Container') {
             steps {
-                // remove existing container
-                // run new container
+                script {
+                    // Run a Docker container
+                    docker.image('my-app-image:latest').run('-p 8080:8080')
+                }
             }
-        }
 
     }
 }
