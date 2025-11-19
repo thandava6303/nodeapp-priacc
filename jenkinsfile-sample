@@ -1,12 +1,12 @@
 pipeline {
     agent any
+properties([pipelineTriggers([pollSCM('* * * * *')])])
 
     stages {
 
         stage('Clone Repository') {
             steps {
-                // your git clone code here
-            }
+             git branch: 'main', url: 'https://github.com/thandava6303/nodeapp-priacc.git'            }
         }
 
         stage('Check Required Tools') {
