@@ -1,6 +1,6 @@
 pipeline {
     agent any
-properties([pipelineTriggers([pollSCM('* * * * *')])])
+
 
     stages {
 
