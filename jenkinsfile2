@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+      tools {
+  nodejs 'node'
+}
+    stages {
+        stage('check the code from scm') {
+            steps {
+                git branch: 'main', url: 'https://github.com/thandava6303/nodeapp-priacc.git'
+            }
+        }
+        stage('install npm dependices') {
+            steps {
+                sh'npm install'
+            }
+        }
+        stage('build docker image') {
+            steps {
+                sh'docker build -t nodeapp .'
+            }
+        }
+        stage("Docker Push"){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'docker_password', usernameVariable: 'docker_user')]) {
+                    sh "docker login -u ${docker_user} -p ${docker_password}"
+                }
+                sh "docker push thandava/nodeapp:${currentBuild.number}"
+            }
+            
+        stage('build docker container') {
+            steps {
+                sh'docker run -d -p 3001:3000 --name thandavacontainer1 nodeapp'
+            }
+        }
+    }
+}
