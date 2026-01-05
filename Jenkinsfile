@@ -43,12 +43,12 @@ triggers {
     }
 post {
     success {
-        mail to: 'kaluvalathandavakrishna@priaccinnovations.ai',
+        mail to: 'thandavakaluvala@gmail.com',
              subject: "Build SUCCESS: ${env.JOB_NAME}",
              body: "Build ${env.BUILD_NUMBER} succeeded."
     }
     failure {
-        mail to: 'kaluvalathandavakrishna@priaccinnovations.ai',
+        mail to: 'thandavakaluvala@gmail.com',
              subject: "Build FAILED: ${env.JOB_NAME}",
              body: "Please check Jenkins console output."
     }
