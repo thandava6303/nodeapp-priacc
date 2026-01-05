@@ -1,53 +1,56 @@
 pipeline {
     agent any
-
-
+      tools {
+  nodejs 'node'
+}
+triggers {
+  pollSCM '* * * * *'
+} 
     stages {
-
-        stage('Clone Repository') {
+        stage('check the code from scm') {
             steps {
-             git branch: 'main', url: 'https://github.com/thandava6303/nodeapp-priacc.git'            }
+                git branch: 'main', url: 'https://github.com/thandava6303/nodeapp-priacc.git'
+            }
         }
-
-        stage('Check Required Tools') {
-           steps {
-                echo 'Checking Docker version...'
-                sh 'docker --version'
+        stage('install npm dependices') {
+            steps {
+                sh'npm install'
+            }
+        }
+        stage('build docker image') {
+            steps {
+                sh'docker build -t thandava/newnodeapp-1 .'
+            }
+        }
+        stage("Docker Push"){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'docker_password', usernameVariable: 'docker_user')]) {
+                    sh "docker login -u ${docker_user} -p ${docker_password}"
+                }
+                sh "docker push thandava/newnodeapp-1"
                 
-                echo 'Checking unzip version...'
-                sh 'unzip -v'
+            }
+        } 
+        stage('build docker container') {
+            steps {
+                sh'docker stop krishnacontainer'
+                sh'docker rm krishnacontainer'
+                sh'docker run -d -p 3000:3000 --name krishnacontainer thandava/newnodeapp-1'
             }
         }
-
-        stage('Unzip Source Code') {
-            steps {
-                // unzip your code here
-            }
-        }
-
-        stage('Navigate & List Files') {
-            steps {
-                // cd into main folder
-                // list files
-            }
-        }
-
-        stage('Docker Build Image') {
-             steps {
-                script {
-                    // Build a Docker image from a Dockerfile
-                    docker.build('my-app-image:latest')
-                }
-            }
-
-        stage('Docker Run Container') {
-            steps {
-                script {
-                    // Run a Docker container
-                    docker.image('my-app-image:latest').run('-p 8080:8080')
-                }
-            }
+      
 
     }
+post {
+    success {
+        mail to: 'kaluvalathandavakrishna@priaccinnovations.ai',
+             subject: "Build SUCCESS: ${env.JOB_NAME}",
+             body: "Build ${env.BUILD_NUMBER} succeeded."
+    }
+    failure {
+        mail to: 'kaluvalathandavakrishna@priaccinnovations.ai',
+             subject: "Build FAILED: ${env.JOB_NAME}",
+             body: "Please check Jenkins console output."
+    }
 }
-
+}
